@@ -22,7 +22,6 @@
  * SOFTWARE.
  * 
  * A simple integral controller using only float calculations (no doubles).
- * Maintains the integrated error as the state.
  * 
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
@@ -31,62 +30,42 @@
 #ifndef CONTROLALGORITHMS_INTEGRAL_H
 #define CONTROLALGORITHMS_INTEGRAL_H
 
+#include "utils/integralInput.h"
+#include "utils/integralOutput.h"
+#include "utils/integralSettings.h"
+#include "utils/utilities.h"
+
 namespace ControlAlgorithms {
 
 class Integral {
     public:
         Integral() {};
+        
+        /**
+         * Set the controller settings
+         * @param settings [in]: Utils::IntegralSettings controller settings
+         */
+        void setSettings(const Utils::IntegralSettings &settings) {
+            settings_.copy(settings);
+        }
 
         /**
          * The calculate function for the integral controller
-         * @param error: float error value
-         * @param delta_t: float change in time since last call in correct time units
-         * @return float: the resulting control signal
+         * @param input [in]: Utils::IntegralInput values used to calculate the control signal
+         * @param out [out]: Utils::IntegralOutput the output signal and any additional/changed data used for continued computations
          */
-        float calculate(float error, float delta_t);
-
-        /**
-         * Set the windup limits
-         * @param has_limits: bool whether the integral controller has limits
-         * @param min_limit: float the lower limit
-         * @param max_limit: float the upper limit
-         */
-        void set_limits(bool has_limits, float min_limit=0.0, float max_limit=0.0) {
-            has_limits_ = has_limits;
-            min_limit_ = min_limit;
-            max_limit_ = max_limit;
-        }
-
-        /**
-         * Sets the gain for the controller
-         * @param gain: float the gain
-         */
-        void set_gain(float gain) {
-            gain_ = gain;
-        }
-
-        /**
-         * Resets the internal state (the integrated error)
-         */
-        void reset() {
-            integral_state_ = 0.0;
+        void update(const Utils::IntegralInput input, Utils::IntegralOutput &out) {
+            Utils::Utilities::integral(input, settings_, out);
+            // Copy to state for next round
+            state_.copy(out);
         }
 
     private:
-        // The integral gain
-        float gain_{0.0};
+        // The stored settings
+        Utils::IntegralSettings settings_;
 
-        // The integrated error
-        float integral_state_{0.0};
-
-        // Whether the integral state has windup limits
-        bool has_limits_{false};
-
-        // The minimum limit, if it exists
-        float min_limit_{0.0};
-
-        // The maximum limit, if it exists
-        float max_limit_{0.0};
+        // Contains all required state info
+        Utils::IntegralOutput state_;
 };
 
 }  // namespace ControlAlgorithms

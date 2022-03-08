@@ -21,53 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * A simple derivative controller using only float calculations (no doubles).
- * 
+ * Base class input for control algorithms
+ *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_DERIVATIVE_H
-#define CONTROLALGORITHMS_DERIVATIVE_H
-
-#include "utils/derivativeInput.h"
-#include "utils/derivativeOutput.h"
-#include "utils/controlSettings.h"
-#include "utils/utilities.h"
+#ifndef CONTROLALGORITHMS_UTILS_CONTROL_INPUT_H
+#define CONTROLALGORITHMS_UTILS_CONTROL_INPUT_H
 
 namespace ControlAlgorithms {
+namespace Utils {
 
-class Derivative {
+class ControlInput {
     public:
-        Derivative() {};
-        
-        /**
-         * Set the controller settings
-         * @param settings [in]: Utils::ControlSettings controller settings
-         */
-        void setSettings(const Utils::ControlSettings &settings) {
-            settings_.copy(settings);
-        }
+        ControlInput () {};
 
         /**
-         * The calculate function for the derivative controller
-         * @param input [in]: Utils::DerivativeInput values used to calculate the control signal
-         * @param out [out]: Utils::DerivativeOutput the output signal and any additional/changed data used for continued computations
+         * Copy in
+         * @param right [in]: ControlInput input
          */
-        void update(const Utils::DerivativeInput input, Utils::DerivativeOutput &out) {
-            Utils::Utilities::derivative(input, settings_, out);
-            // Copy to state for next round
-            state_.copy(out);
+        void copy(const ControlInput &right) {
+            setError(right.getError());
+            setDeltaT(right.getDeltaT());
         }
+
+        void setError(float error) { error_ = error; }
+        float getError() const { return error_; }
+        void setDeltaT(float delta_t) { delta_t_ = delta_t; }
+        float getDeltaT() const { return delta_t_; }
 
     private:
-        // The stored settings
-        Utils::ControlSettings settings_;
+        // The current error signal
+        float error_{0.0};
 
-        // Contains all required state info
-        Utils::DerivativeOutput state_;
+        // Time since the last call in appropriate units (not required for all algorithms)
+        float delta_t_{0.0};
 };
 
+}  // namespace Utils
 }  // namespace ControlAlgorithms
 
 #endif

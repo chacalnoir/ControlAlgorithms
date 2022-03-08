@@ -21,53 +21,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * A simple derivative controller using only float calculations (no doubles).
- * 
+ * Any settings used for an integral controller
+ *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_DERIVATIVE_H
-#define CONTROLALGORITHMS_DERIVATIVE_H
+#ifndef CONTROLALGORITHMS_UTILS_INTEGRAL_SETTINGS_H
+#define CONTROLALGORITHMS_UTILS_INTEGRAL_SETTINGS_H
 
-#include "utils/derivativeInput.h"
-#include "utils/derivativeOutput.h"
-#include "utils/controlSettings.h"
-#include "utils/utilities.h"
+#include "controlSettings.h"
 
 namespace ControlAlgorithms {
+namespace Utils {
 
-class Derivative {
+class IntegralSettings : public ControlSettings {
     public:
-        Derivative() {};
-        
-        /**
-         * Set the controller settings
-         * @param settings [in]: Utils::ControlSettings controller settings
-         */
-        void setSettings(const Utils::ControlSettings &settings) {
-            settings_.copy(settings);
-        }
+        IntegralSettings () {};
+        virtual ~IntegralSettings() {};
 
         /**
-         * The calculate function for the derivative controller
-         * @param input [in]: Utils::DerivativeInput values used to calculate the control signal
-         * @param out [out]: Utils::DerivativeOutput the output signal and any additional/changed data used for continued computations
+         * Copy in
+         * @param right [in]: IntegralSettings input control settings
          */
-        void update(const Utils::DerivativeInput input, Utils::DerivativeOutput &out) {
-            Utils::Utilities::derivative(input, settings_, out);
-            // Copy to state for next round
-            state_.copy(out);
+        void copy(const IntegralSettings &right) {
+            // Call super class
+            IntegralSettings::copy(right);
+            
+            setHasLimits(right.getHasLimits());
+            setMinLimit(right.getMinLimit());
+            setMaxLimit(right.getMaxLimit());
         }
+        
+        void setHasLimits(bool limits) { has_limits_ = limits; }
+        bool getHasLimits() const { return has_limits_; }
+        void setMinLimit(float min_limit) { min_limit_ = min_limit; }
+        float getMinLimit() const { return min_limit_; }
+        void setMaxLimit(float max_limit) { max_limit_ = max_limit; }
+        float getMaxLimit() const { return max_limit_; }
 
     private:
-        // The stored settings
-        Utils::ControlSettings settings_;
+        // Whether the integral state has windup limits
+        bool has_limits_{false};
 
-        // Contains all required state info
-        Utils::DerivativeOutput state_;
+        // The minimum limit, if it exists
+        float min_limit_{0.0};
+
+        // The maximum limit, if it exists
+        float max_limit_{0.0};
 };
 
+}  // namespace Utils
 }  // namespace ControlAlgorithms
 
 #endif

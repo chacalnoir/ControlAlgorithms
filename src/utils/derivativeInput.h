@@ -21,29 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * A simple integral controller using only float calculations (no doubles).
- * Maintains the integrated error as the state.
- * 
+ * Input for derivative controller
+ *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#include "Integral.h"
-#include <algorithm>
+#ifndef CONTROLALGORITHMS_UTILS_DERIVATIVE_INPUT_H
+#define CONTROLALGORITHMS_UTILS_DERIVATIVE_INPUT_H
+
+#include "controlInput.h"
 
 namespace ControlAlgorithms {
+namespace Utils {
 
-float Integral::calculate(float error, float delta_t) {
-    // Update the integral state
-    integral_state_ += error * delta_t;
+class DerivativeInput: public ControlInput {
+    public:
+        DerivativeInput () {};
 
-    // Handle windup limits
-    if(has_limits_) {
-        integral_state_ = std::min(max_limit_, std::max(min_limit_, integral_state_));
-    }
+        /**
+         * Copy in
+         * @param right [in]: DerivativeInput input
+         */
+        void copy(const DerivativeInput &right) {
+            // Super call
+            ControlInput::copy(right);
 
-    // Calculate and return the control signal
-    return integral_state_ * gain_;
-}
+            setPreviousError(right.getPreviousError());
+        }
 
+        void setPreviousError(float previous_error) { previous_error_ = previous_error; }
+        float getPreviousError() const { return previous_error_; }
+
+    private:
+        // The previous error
+        float previous_error_{0.0};
+};
+
+}  // namespace Utils
 }  // namespace ControlAlgorithms
+
+#endif

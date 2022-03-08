@@ -21,53 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * A simple derivative controller using only float calculations (no doubles).
- * 
+ * Output class for derivative controller
+ *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_DERIVATIVE_H
-#define CONTROLALGORITHMS_DERIVATIVE_H
+#ifndef CONTROLALGORITHMS_UTILS_DERIVATIVE_OUTPUT_H
+#define CONTROLALGORITHMS_UTILS_DERIVATIVE_OUTPUT_H
 
-#include "utils/derivativeInput.h"
-#include "utils/derivativeOutput.h"
-#include "utils/controlSettings.h"
-#include "utils/utilities.h"
+#include "controlOutput.h"
 
 namespace ControlAlgorithms {
+namespace Utils {
 
-class Derivative {
+class DerivativeOutput: public ControlOutput {
     public:
-        Derivative() {};
-        
-        /**
-         * Set the controller settings
-         * @param settings [in]: Utils::ControlSettings controller settings
-         */
-        void setSettings(const Utils::ControlSettings &settings) {
-            settings_.copy(settings);
-        }
+        DerivativeOutput () {};
 
         /**
-         * The calculate function for the derivative controller
-         * @param input [in]: Utils::DerivativeInput values used to calculate the control signal
-         * @param out [out]: Utils::DerivativeOutput the output signal and any additional/changed data used for continued computations
+         * Copy in
+         * @param right [in]: DerivativeOutput input
          */
-        void update(const Utils::DerivativeInput input, Utils::DerivativeOutput &out) {
-            Utils::Utilities::derivative(input, settings_, out);
-            // Copy to state for next round
-            state_.copy(out);
+        void copy(const DerivativeOutput &right) {
+            // Super call
+            ControlOutput::copy(right);
+
+            setPreviousError(right.getPreviousError());
         }
+
+        void setPreviousError(float previous_error) { previous_error_ = previous_error; }
+        float getPreviousError() const { return previous_error_; }
 
     private:
-        // The stored settings
-        Utils::ControlSettings settings_;
-
-        // Contains all required state info
-        Utils::DerivativeOutput state_;
+        // The previous error
+        float previous_error_{0.0};
 };
 
+}  // namespace Utils
 }  // namespace ControlAlgorithms
 
 #endif

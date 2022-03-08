@@ -22,7 +22,7 @@
  * SOFTWARE.
  * 
  * A simple proportional controller using only float calculations (no doubles).
- * Since proportional controllers do not require state, this one is stateless.
+ * 
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
@@ -30,21 +30,36 @@
 #ifndef CONTROLALGORITHMS_PROPORTIONAL_H
 #define CONTROLALGORITHMS_PROPORTIONAL_H
 
+#include "utils/controlInput.h"
+#include "utils/controlOutput.h"
+#include "utils/controlSettings.h"
+#include "utils/utilities.h"
+
 namespace ControlAlgorithms {
 
 class Proportional {
     public:
+        Proportional() {};
+        
+        /**
+         * Set the controller settings
+         * @param settings [in]: Utils::ControlSettings controller settings
+         */
+        void setSettings(const Utils::ControlSettings &settings) {
+            settings_.copy(settings);
+        }
+
         /**
          * The calculate function for the proportional controller
-         * @param error: float error value
-         * @param gain: float multiplier for the error
-         * @return float: the resulting control signal
+         * @param input [in]: Utils::ControlInput values used to calculate the control signal
+         * @param out [out]: Utils::ControlOutput the output signal and any additional/changed data used for continued computations
          */
-        static float calculate(float error, float gain);
+        void update(const Utils::ControlInput input, Utils::ControlOutput &out) {
+            Utils::Utilities::proportional(input, settings_, out);
+        }
 
     private:
-        // Private constructor to ensure only the static/stateless functions are used.
-        Proportional() {};
+        Utils::ControlSettings settings_;
 };
 
 }  // namespace ControlAlgorithms

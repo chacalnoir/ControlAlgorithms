@@ -21,18 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * A simple proportional controller using only float calculations (no doubles).
- * Since proportional controllers do not require state, this one is stateless.
+ * Input for integral controller
+ *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#include "Proportional.h"
+#ifndef CONTROLALGORITHMS_UTILS_INTEGRAL_INPUT_H
+#define CONTROLALGORITHMS_UTILS_INTEGRAL_INPUT_H
+
+#include "controlInput.h"
 
 namespace ControlAlgorithms {
+namespace Utils {
 
-float Proportional::calculate(float error, float gain) {
-    return error * gain;
-}
+class IntegralInput: public ControlInput {
+    public:
+        IntegralInput () {};
 
+        /**
+         * Copy in
+         * @param right [in]: IntegralInput input
+         */
+        void copy(const IntegralInput &right) {
+            // Super call
+            ControlInput::copy(right);
+
+            setIntegratedError(right.getIntegratedError());
+        }
+
+        void setIntegratedError(float int_error) { integrated_error_ = int_error; }
+        float getIntegratedError() const { return integrated_error_; }
+
+    private:
+        // The current integrated error
+        float integrated_error_{0.0};
+};
+
+}  // namespace Utils
 }  // namespace ControlAlgorithms
+
+#endif

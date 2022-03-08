@@ -21,27 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * A simple derivative controller using only float calculations (no doubles).
- * Maintains the previous error as the state.
- * 
+ * Output class for integral controller
+ *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#include "Derivative.h"
-#include <algorithm>
+#ifndef CONTROLALGORITHMS_UTILS_INTEGRAL_OUTPUT_H
+#define CONTROLALGORITHMS_UTILS_INTEGRAL_OUTPUT_H
+
+#include "controlOutput.h"
 
 namespace ControlAlgorithms {
+namespace Utils {
 
-float Derivative::calculate(float error, float delta_t) {
-    // Update the derivative calculation
-    float error_derivative = (error - previous_error_) / std::max(delta_t, (float)ZERO_DELTA);
+class IntegralOutput: public ControlOutput {
+    public:
+        IntegralOutput () {};
 
-    // Save the previous error
-    previous_error_ = error;
+        /**
+         * Copy in
+         * @param right [in]: IntegralOutput input
+         */
+        void copy(const IntegralOutput &right) {
+            // Super call
+            ControlOutput::copy(right);
 
-    // Calculate and return the control signal
-    return error_derivative * gain_;
-}
+            setIntegratedError(right.getIntegratedError());
+        }
 
+        void setIntegratedError(float int_error) { integrated_error_ = int_error; }
+        float getIntegratedError() const { return integrated_error_; }
+
+    private:
+        // The current integrated error
+        float integrated_error_{0.0};
+};
+
+}  // namespace Utils
 }  // namespace ControlAlgorithms
+
+#endif
