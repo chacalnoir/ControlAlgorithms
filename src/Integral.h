@@ -51,13 +51,26 @@ class Integral {
 
         /**
          * The calculate function for the integral controller
-         * @param input [in]: Utils::IntegralInput values used to calculate the control signal
-         * @param out [out]: Utils::IntegralOutput the output signal and any additional/changed data used for continued computations
+         * @param input [in]: Utils::ControlInput values used to calculate the control signal
+         * @param out [out]: Utils::ControlOutput the output signal and any additional/changed data used for continued computations
          */
-        void update(const Utils::IntegralInput input, Utils::IntegralOutput &out) {
-            Utils::Utilities::integral(input, settings_, out);
-            // Copy to state for next round
-            state_.copy(out);
+        void update(const Utils::ControlInput input, Utils::ControlOutput &out) {
+            // Set the input using the state
+            static_cast<Utils::ControlInput>(input_with_state_).copy(input);
+            input_with_state_.setIntegratedError(state_.getIntegratedError());
+
+            // Run the update
+            Utils::Utilities::integral(input_with_state_, settings_, state_);
+
+            // Copy to output
+            out.copy(static_cast<Utils::ControlOutput>(state_));
+        }
+
+        /**
+         * Reset the internal state
+         */
+        void reset() {
+            state_.setIntegratedError(0.0);
         }
 
     private:
@@ -66,6 +79,9 @@ class Integral {
 
         // Contains all required state info
         Utils::IntegralOutput state_;
+
+        // Used for the internal call with state
+        Utils::IntegralInput input_with_state_;
 };
 
 }  // namespace ControlAlgorithms

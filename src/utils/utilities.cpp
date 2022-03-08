@@ -52,9 +52,9 @@ void Utilities::integral(const IntegralInput input, const IntegralSettings setti
     out.setControl(out.getIntegratedError() * settings.getGain());
 }
 
-void Utilities::derivative(const DerivativeInput input, const ControlSettings settings, DerivativeOutput &out) {
+void Utilities::derivative(const DerivativeInput input, const DerivativeSettings settings, DerivativeOutput &out) {
     // Update the derivative calculation
-    float error_derivative = (input.getError() - input.getPreviousError()) / std::max(input.getDeltaT(), (float)ZERO_DELTA);
+    float error_derivative = (input.getError() - input.getPreviousError()) / std::max(input.getDeltaT(), settings.getMinTimeStep());
 
     // Save the previous error
     out.setPreviousError(input.getError());

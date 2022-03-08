@@ -32,7 +32,7 @@
 
 #include "utils/derivativeInput.h"
 #include "utils/derivativeOutput.h"
-#include "utils/controlSettings.h"
+#include "utils/derivativeSettings.h"
 #include "utils/utilities.h"
 
 namespace ControlAlgorithms {
@@ -43,29 +43,45 @@ class Derivative {
         
         /**
          * Set the controller settings
-         * @param settings [in]: Utils::ControlSettings controller settings
+         * @param settings [in]: Utils::DerivativeSettings controller settings
          */
-        void setSettings(const Utils::ControlSettings &settings) {
+        void setSettings(const Utils::DerivativeSettings &settings) {
             settings_.copy(settings);
         }
 
         /**
          * The calculate function for the derivative controller
-         * @param input [in]: Utils::DerivativeInput values used to calculate the control signal
-         * @param out [out]: Utils::DerivativeOutput the output signal and any additional/changed data used for continued computations
+         * @param input [in]: Utils::ControlInput values used to calculate the control signal
+         * @param out [out]: Utils::ControlOutput the output signal and any additional/changed data used for continued computations
          */
-        void update(const Utils::DerivativeInput input, Utils::DerivativeOutput &out) {
-            Utils::Utilities::derivative(input, settings_, out);
-            // Copy to state for next round
-            state_.copy(out);
+        void update(const Utils::ControlInput input, Utils::ControlOutput &out) {
+            // Set the input using the state
+            static_cast<Utils::ControlInput>(input_with_state_).copy(input);
+            input_with_state_.setPreviousError(state_.getPreviousError());
+
+            // Run the update
+            Utils::Utilities::derivative(input_with_state_, settings_, state_);
+
+            // Copy to output
+            out.copy(static_cast<Utils::ControlOutput>(state_));
+        }
+
+        /**
+         * Reset the internal state
+         */
+        void reset() {
+            state_.setPreviousError(0.0);
         }
 
     private:
         // The stored settings
-        Utils::ControlSettings settings_;
+        Utils::DerivativeSettings settings_;
 
         // Contains all required state info
         Utils::DerivativeOutput state_;
+
+        // Used for the internal call with state
+        Utils::DerivativeInput input_with_state_;
 };
 
 }  // namespace ControlAlgorithms

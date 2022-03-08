@@ -33,17 +33,13 @@
 
 #include "controlSettings.h"
 #include "integralSettings.h"
+#include "derivativeSettings.h"
 #include "controlInput.h"
 #include "controlOutput.h"
 #include "integralInput.h"
 #include "integralOutput.h"
 #include "derivativeInput.h"
 #include "derivativeOutput.h"
-
-// Required to avoid divide by zero
-#ifndef ZERO_DELTA
-  #define ZERO_DELTA 0.0000001
-#endif
 
 namespace ControlAlgorithms {
 namespace Utils {
@@ -69,10 +65,10 @@ class Utilities {
         /**
          * The calculate function for the derivative controller
          * @param input [in]: DerivativeInput values used to calculate the control signal
-         * @param settings [in]: ControlSettings the controller settings
+         * @param settings [in]: DerivativeSettings the controller settings
          * @param out [out]: DerivativeOutput the output signal and any additional/changed data used for continued computations
          */
-        static void derivative(const DerivativeInput input, const ControlSettings settings, DerivativeOutput &out);
+        static void derivative(const DerivativeInput input, const DerivativeSettings settings, DerivativeOutput &out);
 
     private:
         // Private constructor to ensure only the static/stateless functions are used.
