@@ -21,39 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * Settings used for all controls
+ * Output class for integral controller
  *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_UTILS_CONTROL_SETTINGS_H
-#define CONTROLALGORITHMS_UTILS_CONTROL_SETTINGS_H
+#ifndef CONTROLALGORITHMS_PID_INTEGRAL_OUTPUT_H
+#define CONTROLALGORITHMS_PID_INTEGRAL_OUTPUT_H
+
+#include <base/controlOutput.h>
 
 namespace ControlAlgorithms {
-namespace Utils {
+namespace PID {
 
-class ControlSettings {
+class IntegralOutput: public Base::ControlOutput {
     public:
-        ControlSettings() {};
-        virtual ~ControlSettings() {};
+        IntegralOutput () {};
+        virtual ~IntegralOutput() {};
 
         /**
          * Copy in
-         * @param right [in]: ControlSettings input control settings
+         * @param right [in]: IntegralOutput input
          */
-        void copy(const ControlSettings &right) {
-            setGain(right.getGain());
+        void copy(const IntegralOutput &right) {
+            // Super call
+            Base::ControlOutput::copy(right);
+
+            setIntegratedError(right.getIntegratedError());
         }
-    
-        void setGain(float gain) { gain_ = gain; }
-        float getGain() const { return gain_; }
+
+        void setIntegratedError(float int_error) { integrated_error_ = int_error; }
+        float getIntegratedError() const { return integrated_error_; }
+
     private:
-        // The gain
-        float gain_{0.0};
+        // The current integrated error
+        float integrated_error_{0.0};
 };
 
-}  // namespace Utils
+}  // namespace PID
 }  // namespace ControlAlgorithms
 
 #endif

@@ -21,45 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * Base class input for control algorithms
+ * Stateless version of proportional control algorithm
  *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_UTILS_CONTROL_INPUT_H
-#define CONTROLALGORITHMS_UTILS_CONTROL_INPUT_H
+#ifndef CONTROLALGORITHMS_PID_PROPORTIONAL_STATELESS_H
+#define CONTROLALGORITHMS_PID_PROPORTIONAL_STATELESS_H
+
+#include <base/controlInput.h>
+#include <base/controlSettings.h>
+#include <base/controlOutput.h>
 
 namespace ControlAlgorithms {
-namespace Utils {
+namespace PID {
 
-class ControlInput {
+class ProportionalStateless {
     public:
-        ControlInput () {};
-
         /**
-         * Copy in
-         * @param right [in]: ControlInput input
+         * The calculate function for the proportional controller
+         * @param input [in]: Base::ControlInput values used to calculate the control signal
+         * @param settings [in]: Base::ControlSettings the controller settings
+         * @param out [out]: Base::ControlOutput the output signal and any additional/changed data used for continued computations
          */
-        void copy(const ControlInput &right) {
-            setError(right.getError());
-            setDeltaT(right.getDeltaT());
-        }
-
-        void setError(float error) { error_ = error; }
-        float getError() const { return error_; }
-        void setDeltaT(float delta_t) { delta_t_ = delta_t; }
-        float getDeltaT() const { return delta_t_; }
-
+        static void update(const Base::ControlInput input, const Base::ControlSettings settings, Base::ControlOutput &out);
     private:
-        // The current error signal
-        float error_{0.0};
-
-        // Time since the last call in appropriate units (not required for all algorithms)
-        float delta_t_{0.0};
+        // Private constructor to ensure only the static/stateless functions are used.
+        ProportionalStateless() {};
 };
 
-}  // namespace Utils
+}  // namespace PID
 }  // namespace ControlAlgorithms
 
-#endif
+#endif  // CONTROLALGORITHMS_PID_PROPORTIONAL_STATELESS_H

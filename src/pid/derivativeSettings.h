@@ -21,39 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * Base class output for all control algorithms
+ * Any settings used for a derivative controller
  *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_UTILS_CONTROL_OUTPUT_H
-#define CONTROLALGORITHMS_UTILS_CONTROL_OUTPUT_H
+#ifndef CONTROLALGORITHMS_PID_DERIVATIVE_SETTINGS_H
+#define CONTROLALGORITHMS_PID_DERIVATIVE_SETTINGS_H
+
+#include <base/controlSettings.h>
 
 namespace ControlAlgorithms {
-namespace Utils {
+namespace PID {
 
-class ControlOutput {
+class DerivativeSettings : public Base::ControlSettings {
     public:
-        ControlOutput () {};
+        DerivativeSettings () {};
+        virtual ~DerivativeSettings() {};
 
         /**
          * Copy in
-         * @param right [in]: ControlOutput input
+         * @param right [in]: DerivativeSettings input control settings
          */
-        void copy(const ControlOutput &right) {
-            setControl(right.getControl());
+        void copy(const DerivativeSettings &right) {
+            // Call super class
+            Base::ControlSettings::copy(right);
+            
+            setMinTimeStep(right.getMinTimeStep());
         }
-
-        void setControl(float control) { control_ = control; }
-        float getControl() const { return control_; }
+        
+        void setMinTimeStep(bool min_time_step) { min_time_step_ = min_time_step; }
+        float getMinTimeStep() const { return min_time_step_; }
 
     private:
-        // The current control signal
-        float control_{0.0};
+        // The minimum time step allowed
+        float min_time_step_{0.0000001};
 };
 
-}  // namespace Utils
+}  // namespace PID
 }  // namespace ControlAlgorithms
 
 #endif

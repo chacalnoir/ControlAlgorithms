@@ -21,47 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * A simple proportional controller using only float calculations (no doubles).
+ * Stateless implementation of integral control
  * 
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_PROPORTIONAL_H
-#define CONTROLALGORITHMS_PROPORTIONAL_H
-
-#include "utils/controlInput.h"
-#include "utils/controlOutput.h"
-#include "utils/controlSettings.h"
-#include "utils/utilities.h"
+#include "integralStateless.h"
+#include <algorithm>
 
 namespace ControlAlgorithms {
 
-class Proportional {
-    public:
-        Proportional() {};
-        
-        /**
-         * Set the controller settings
-         * @param settings [in]: Utils::ControlSettings controller settings
-         */
-        void setSettings(const Utils::ControlSettings &settings) {
-            settings_.copy(settings);
-        }
+namespace PID {
 
-        /**
-         * The calculate function for the proportional controller
-         * @param input [in]: Utils::ControlInput values used to calculate the control signal
-         * @param out [out]: Utils::ControlOutput the output signal and any additional/changed data used for continued computations
-         */
-        void update(const Utils::ControlInput input, Utils::ControlOutput &out) {
-            Utils::Utilities::proportional(input, settings_, out);
-        }
+void IntegralStateless::update(const IntegralInput input, const IntegralSettings settings, IntegralOutput &out) {
+    out.setControl(input.getError() * settings.getGain());
 
-    private:
-        Utils::ControlSettings settings_;
-};
+    // Update the integral state
+    out.setIntegratedError(input.getIntegratedError() + input.getError() * input.getDeltaT());
 
+    // Handle windup limits
+    if(settings.getHasLimits()) {
+        out.setIntegratedError(std::min(settings.getMaxLimit(), std::max(settings.getMinLimit(), out.getIntegratedError())));
+    }
+
+    // Calculate and return the control signal
+    out.setControl(out.getIntegratedError() * settings.getGain());
+}
+
+}  // namespace PID
 }  // namespace ControlAlgorithms
-
-#endif

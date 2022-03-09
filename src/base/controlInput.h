@@ -21,44 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * Input for derivative controller
+ * Base class input for control algorithms
  *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_UTILS_DERIVATIVE_INPUT_H
-#define CONTROLALGORITHMS_UTILS_DERIVATIVE_INPUT_H
-
-#include "controlInput.h"
+#ifndef CONTROLALGORITHMS_BASE_CONTROL_INPUT_H
+#define CONTROLALGORITHMS_BASE_CONTROL_INPUT_H
 
 namespace ControlAlgorithms {
-namespace Utils {
+namespace Base {
 
-class DerivativeInput: public ControlInput {
+class ControlInput {
     public:
-        DerivativeInput () {};
+        ControlInput () {};
+        virtual ~ControlInput () {};
 
         /**
          * Copy in
-         * @param right [in]: DerivativeInput input
+         * @param right [in]: ControlInput input
          */
-        void copy(const DerivativeInput &right) {
-            // Super call
-            ControlInput::copy(right);
-
-            setPreviousError(right.getPreviousError());
+        void copy(const ControlInput &right) {
+            setError(right.getError());
+            setDeltaT(right.getDeltaT());
         }
 
-        void setPreviousError(float previous_error) { previous_error_ = previous_error; }
-        float getPreviousError() const { return previous_error_; }
+        void setError(float error) { error_ = error; }
+        float getError() const { return error_; }
+        void setDeltaT(float delta_t) { delta_t_ = delta_t; }
+        float getDeltaT() const { return delta_t_; }
 
     private:
-        // The previous error
-        float previous_error_{0.0};
+        // The current error signal
+        float error_{0.0};
+
+        // Time since the last call in appropriate units (not required for all algorithms)
+        float delta_t_{0.0};
 };
 
-}  // namespace Utils
+}  // namespace Base
 }  // namespace ControlAlgorithms
 
 #endif

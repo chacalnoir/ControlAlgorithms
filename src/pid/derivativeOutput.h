@@ -21,44 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * Input for integral controller
+ * Output class for derivative controller
  *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_UTILS_INTEGRAL_INPUT_H
-#define CONTROLALGORITHMS_UTILS_INTEGRAL_INPUT_H
+#ifndef CONTROLALGORITHMS_PID_DERIVATIVE_OUTPUT_H
+#define CONTROLALGORITHMS_PID_DERIVATIVE_OUTPUT_H
 
-#include "controlInput.h"
+#include <base/controlOutput.h>
 
 namespace ControlAlgorithms {
-namespace Utils {
+namespace PID {
 
-class IntegralInput: public ControlInput {
+class DerivativeOutput: public Base::ControlOutput {
     public:
-        IntegralInput () {};
+        DerivativeOutput () {};
+        virtual ~DerivativeOutput() {};
 
         /**
          * Copy in
-         * @param right [in]: IntegralInput input
+         * @param right [in]: DerivativeOutput input
          */
-        void copy(const IntegralInput &right) {
+        void copy(const DerivativeOutput &right) {
             // Super call
-            ControlInput::copy(right);
+            Base::ControlOutput::copy(right);
 
-            setIntegratedError(right.getIntegratedError());
+            setPreviousError(right.getPreviousError());
         }
 
-        void setIntegratedError(float int_error) { integrated_error_ = int_error; }
-        float getIntegratedError() const { return integrated_error_; }
+        void setPreviousError(float previous_error) { previous_error_ = previous_error; }
+        float getPreviousError() const { return previous_error_; }
 
     private:
-        // The current integrated error
-        float integrated_error_{0.0};
+        // The previous error
+        float previous_error_{0.0};
 };
 
-}  // namespace Utils
+}  // namespace PID
 }  // namespace ControlAlgorithms
 
 #endif

@@ -21,61 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * Utilities class for any control algorithms that can have settings and/or state passed in.
- *   These are all static, stateless functions.
+ * Stateless version of derivative control algorithm
  *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_UTILS_UTILITIES_H
-#define CONTROLALGORITHMS_UTILS_UTILITIES_H
+#ifndef CONTROLALGORITHMS_PID_DERIVATIVE_STATELESS_H
+#define CONTROLALGORITHMS_PID_DERIVATIVE_STATELESS_H
 
-#include "controlSettings.h"
-#include "integralSettings.h"
-#include "derivativeSettings.h"
-#include "controlInput.h"
-#include "controlOutput.h"
-#include "integralInput.h"
-#include "integralOutput.h"
-#include "derivativeInput.h"
-#include "derivativeOutput.h"
+#include <pid/derivativeInput.h>
+#include <pid/derivativeSettings.h>
+#include <pid/derivativeOutput.h>
 
 namespace ControlAlgorithms {
-namespace Utils {
+namespace PID {
 
-class Utilities {
+class DerivativeStateless {
     public:
         /**
          * The calculate function for the proportional controller
-         * @param input [in]: ControlInput values used to calculate the control signal
-         * @param settings [in]: ControlSettings the controller settings
-         * @param out [out]: ControlOutput the output signal and any additional/changed data used for continued computations
-         */
-        static void proportional(const ControlInput input, const ControlSettings settings, ControlOutput &out);
-
-        /**
-         * The calculate function for the integral controller
-         * @param input [in]: IntegralInput values used to calculate the control signal
-         * @param settings [in]: IntegralSettings the controller settings
-         * @param out [out]: IntegralOutput the output signal and any additional/changed data used for continued computations
-         */
-        static void integral(const IntegralInput input, const IntegralSettings settings, IntegralOutput &out);
-
-        /**
-         * The calculate function for the derivative controller
          * @param input [in]: DerivativeInput values used to calculate the control signal
          * @param settings [in]: DerivativeSettings the controller settings
          * @param out [out]: DerivativeOutput the output signal and any additional/changed data used for continued computations
          */
-        static void derivative(const DerivativeInput input, const DerivativeSettings settings, DerivativeOutput &out);
-
+        static void update(const DerivativeInput input, const DerivativeSettings settings, DerivativeOutput &out);
     private:
         // Private constructor to ensure only the static/stateless functions are used.
-        Utilities() {};
+        DerivativeStateless() {};
 };
 
-}  // namespace Utils
+}  // namespace PID
 }  // namespace ControlAlgorithms
 
-#endif
+#endif  // CONTROLALGORITHMS_PID_DERIVATIVE_STATELESS_H

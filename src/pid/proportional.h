@@ -21,45 +21,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * Any settings used for a derivative controller
- *
+ * A simple proportional controller using only float calculations (no doubles).
+ * 
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_UTILS_DERIVATIVE_SETTINGS_H
-#define CONTROLALGORITHMS_UTILS_DERIVATIVE_SETTINGS_H
+#ifndef CONTROLALGORITHMS_PROPORTIONAL_H
+#define CONTROLALGORITHMS_PROPORTIONAL_H
 
-#include "controlSettings.h"
+#include <base/controlInput.h>
+#include <base/controlSettings.h>
+#include <base/controlOutput.h>
+#include <pid/proportionalStateless.h>
 
 namespace ControlAlgorithms {
-namespace Utils {
+namespace PID {
 
-class DerivativeSettings : public ControlSettings {
+class Proportional {
     public:
-        DerivativeSettings () {};
-        virtual ~DerivativeSettings() {};
+        Proportional() {};
+        virtual ~Proportional() {};
+        
+        /**
+         * Set the controller settings
+         * @param settings [in]: Base::ControlSettings controller settings
+         */
+        virtual void setSettings(const Base::ControlSettings &settings) {
+            settings_.copy(settings);
+        }
 
         /**
-         * Copy in
-         * @param right [in]: DerivativeSettings input control settings
+         * The calculate function for the proportional controller
+         * @param input [in]: Base::ControlInput values used to calculate the control signal
+         * @param out [out]: Base::ControlOutput the output signal and any additional/changed data used for continued computations
          */
-        void copy(const DerivativeSettings &right) {
-            // Call super class
-            DerivativeSettings::copy(right);
-            
-            setMinTimeStep(right.getMinTimeStep());
+        virtual void update(const Base::ControlInput input, Base::ControlOutput &out) {
+            ProportionalStateless::update(input, settings_, out);
         }
-        
-        void setMinTimeStep(bool min_time_step) { min_time_step_ = min_time_step; }
-        float getMinTimeStep() const { return min_time_step_; }
+
+        virtual bool isStateful() { return false; }
 
     private:
-        // The minimum time step allowed
-        float min_time_step_{0.0000001};
+        Base::ControlSettings settings_;
 };
 
-}  // namespace Utils
+}  // namespace PID
 }  // namespace ControlAlgorithms
 
 #endif

@@ -21,44 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * Output class for derivative controller
- *
+ * Stateless implementation of proportional control
+ * 
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_UTILS_DERIVATIVE_OUTPUT_H
-#define CONTROLALGORITHMS_UTILS_DERIVATIVE_OUTPUT_H
-
-#include "controlOutput.h"
+#include "proportionalStateless.h"
+#include <algorithm>
 
 namespace ControlAlgorithms {
-namespace Utils {
 
-class DerivativeOutput: public ControlOutput {
-    public:
-        DerivativeOutput () {};
+using namespace Base;
 
-        /**
-         * Copy in
-         * @param right [in]: DerivativeOutput input
-         */
-        void copy(const DerivativeOutput &right) {
-            // Super call
-            ControlOutput::copy(right);
+namespace PID {
 
-            setPreviousError(right.getPreviousError());
-        }
+void ProportionalStateless::update(const ControlInput input, const ControlSettings settings, ControlOutput &out) {
+    out.setControl(input.getError() * settings.getGain());
+}
 
-        void setPreviousError(float previous_error) { previous_error_ = previous_error; }
-        float getPreviousError() const { return previous_error_; }
-
-    private:
-        // The previous error
-        float previous_error_{0.0};
-};
-
-}  // namespace Utils
+}  // namespace PID
 }  // namespace ControlAlgorithms
-
-#endif

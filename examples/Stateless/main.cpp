@@ -5,21 +5,23 @@
  * @date 2022/03/08
  */
 
-#include <utils/utilities.h>
+#include <pid/proportionalStateless.h>
+#include <pid/integralStateless.h>
+#include <pid/derivativeStateless.h>
 #include <Arduino.h>
 
 // Inputs
-ControlAlgorithms::Utils::ControlInput input_p;
-ControlAlgorithms::Utils::IntegralInput input_i;
-ControlAlgorithms::Utils::DerivativeInput input_d;
+ControlAlgorithms::Base::ControlInput input_p;
+ControlAlgorithms::PID::IntegralInput input_i;
+ControlAlgorithms::PID::DerivativeInput input_d;
 // Settings
-ControlAlgorithms::Utils::ControlSettings settings_p;
-ControlAlgorithms::Utils::IntegralSettings settings_i;
-ControlAlgorithms::Utils::DerivativeSettings settings_d;
+ControlAlgorithms::Base::ControlSettings settings_p;
+ControlAlgorithms::PID::IntegralSettings settings_i;
+ControlAlgorithms::PID::DerivativeSettings settings_d;
 // Outputs
-ControlAlgorithms::Utils::ControlOutput output_p;
-ControlAlgorithms::Utils::IntegralOutput output_i;
-ControlAlgorithms::Utils::DerivativeOutput output_d;
+ControlAlgorithms::Base::ControlOutput output_p;
+ControlAlgorithms::PID::IntegralOutput output_i;
+ControlAlgorithms::PID::DerivativeOutput output_d;
 
 // Timing
 uint64_t msNow{0L};
@@ -80,17 +82,17 @@ void loop() {
   Serial.println(input_p.getDeltaT());
 
   float control_value = 0.0;
-  ControlAlgorithms::Utils::Utilities::proportional(input_p, settings_p, output_p);
+  ControlAlgorithms::PID::ProportionalStateless::update(input_p, settings_p, output_p);
   Serial.print("P control: ");
   Serial.println(output_p.getControl());
   control_value += output_p.getControl();
 
-  ControlAlgorithms::Utils::Utilities::integral(input_i, settings_i, output_i);
+  ControlAlgorithms::PID::IntegralStateless::update(input_i, settings_i, output_i);
   Serial.print("I control: ");
   Serial.println(output_i.getControl());
   control_value += output_i.getControl();
 
-  ControlAlgorithms::Utils::Utilities::derivative(input_d, settings_d, output_d);
+  ControlAlgorithms::PID::DerivativeStateless::update(input_d, settings_d, output_d);
   Serial.print("D control: ");
   Serial.println(output_d.getControl());
   control_value += output_d.getControl();

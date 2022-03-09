@@ -21,44 +21,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * Output class for integral controller
+ * Any settings used for an integral controller
  *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_UTILS_INTEGRAL_OUTPUT_H
-#define CONTROLALGORITHMS_UTILS_INTEGRAL_OUTPUT_H
+#ifndef CONTROLALGORITHMS_PID_INTEGRAL_SETTINGS_H
+#define CONTROLALGORITHMS_PID_INTEGRAL_SETTINGS_H
 
-#include "controlOutput.h"
+#include <base/controlSettings.h>
 
 namespace ControlAlgorithms {
-namespace Utils {
+namespace PID {
 
-class IntegralOutput: public ControlOutput {
+class IntegralSettings : public Base::ControlSettings {
     public:
-        IntegralOutput () {};
+        IntegralSettings () {};
+        virtual ~IntegralSettings() {};
 
         /**
          * Copy in
-         * @param right [in]: IntegralOutput input
+         * @param right [in]: IntegralSettings input control settings
          */
-        void copy(const IntegralOutput &right) {
-            // Super call
-            ControlOutput::copy(right);
-
-            setIntegratedError(right.getIntegratedError());
+        void copy(const IntegralSettings &right) {
+            // Call super class
+            Base::ControlSettings::copy(right);
+            
+            setHasLimits(right.getHasLimits());
+            setMinLimit(right.getMinLimit());
+            setMaxLimit(right.getMaxLimit());
         }
-
-        void setIntegratedError(float int_error) { integrated_error_ = int_error; }
-        float getIntegratedError() const { return integrated_error_; }
+        
+        void setHasLimits(bool limits) { has_limits_ = limits; }
+        bool getHasLimits() const { return has_limits_; }
+        void setMinLimit(float min_limit) { min_limit_ = min_limit; }
+        float getMinLimit() const { return min_limit_; }
+        void setMaxLimit(float max_limit) { max_limit_ = max_limit; }
+        float getMaxLimit() const { return max_limit_; }
 
     private:
-        // The current integrated error
-        float integrated_error_{0.0};
+        // Whether the integral state has windup limits
+        bool has_limits_{false};
+
+        // The minimum limit, if it exists
+        float min_limit_{0.0};
+
+        // The maximum limit, if it exists
+        float max_limit_{0.0};
 };
 
-}  // namespace Utils
+}  // namespace PID
 }  // namespace ControlAlgorithms
 
 #endif

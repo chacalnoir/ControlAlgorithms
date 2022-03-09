@@ -21,57 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * Any settings used for an integral controller
+ * Settings used for all controls
  *
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_UTILS_INTEGRAL_SETTINGS_H
-#define CONTROLALGORITHMS_UTILS_INTEGRAL_SETTINGS_H
-
-#include "controlSettings.h"
+#ifndef CONTROLALGORITHMS_BASE_CONTROL_SETTINGS_H
+#define CONTROLALGORITHMS_BASE_CONTROL_SETTINGS_H
 
 namespace ControlAlgorithms {
-namespace Utils {
+namespace Base {
 
-class IntegralSettings : public ControlSettings {
+class ControlSettings {
     public:
-        IntegralSettings () {};
-        virtual ~IntegralSettings() {};
+        ControlSettings() {};
+        virtual ~ControlSettings() {};
 
         /**
          * Copy in
-         * @param right [in]: IntegralSettings input control settings
+         * @param right [in]: ControlSettings input control settings
          */
-        void copy(const IntegralSettings &right) {
-            // Call super class
-            IntegralSettings::copy(right);
-            
-            setHasLimits(right.getHasLimits());
-            setMinLimit(right.getMinLimit());
-            setMaxLimit(right.getMaxLimit());
+        void copy(const ControlSettings &right) {
+            setGain(right.getGain());
         }
-        
-        void setHasLimits(bool limits) { has_limits_ = limits; }
-        bool getHasLimits() const { return has_limits_; }
-        void setMinLimit(float min_limit) { min_limit_ = min_limit; }
-        float getMinLimit() const { return min_limit_; }
-        void setMaxLimit(float max_limit) { max_limit_ = max_limit; }
-        float getMaxLimit() const { return max_limit_; }
-
+    
+        void setGain(float gain) { gain_ = gain; }
+        float getGain() const { return gain_; }
     private:
-        // Whether the integral state has windup limits
-        bool has_limits_{false};
-
-        // The minimum limit, if it exists
-        float min_limit_{0.0};
-
-        // The maximum limit, if it exists
-        float max_limit_{0.0};
+        // The gain
+        float gain_{0.0};
 };
 
-}  // namespace Utils
+}  // namespace Base
 }  // namespace ControlAlgorithms
 
 #endif

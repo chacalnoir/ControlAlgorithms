@@ -21,69 +21,74 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * A simple integral controller using only float calculations (no doubles).
+ * A simple derivative controller using only float calculations (no doubles).
  * 
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#ifndef CONTROLALGORITHMS_INTEGRAL_H
-#define CONTROLALGORITHMS_INTEGRAL_H
+#ifndef CONTROLALGORITHMS_DERIVATIVE_H
+#define CONTROLALGORITHMS_DERIVATIVE_H
 
-#include "utils/integralInput.h"
-#include "utils/integralOutput.h"
-#include "utils/integralSettings.h"
-#include "utils/utilities.h"
+#include <pid/derivativeInput.h>
+#include <pid/derivativeSettings.h>
+#include <pid/derivativeOutput.h>
+#include <pid/derivativeStateless.h>
 
 namespace ControlAlgorithms {
+namespace PID {
 
-class Integral {
+class Derivative {
     public:
-        Integral() {};
+        Derivative() {};
+        virtual ~Derivative() {};
         
         /**
          * Set the controller settings
-         * @param settings [in]: Utils::IntegralSettings controller settings
+         * @param settings [in]: DerivativeSettings controller settings
          */
-        void setSettings(const Utils::IntegralSettings &settings) {
+        virtual void setSettings(const DerivativeSettings &settings) {
             settings_.copy(settings);
         }
 
         /**
-         * The calculate function for the integral controller
-         * @param input [in]: Utils::ControlInput values used to calculate the control signal
-         * @param out [out]: Utils::ControlOutput the output signal and any additional/changed data used for continued computations
+         * The calculate function for the derivative controller
+         * @param input [in]: Base::ControlInput values used to calculate the control signal
+         * @param out [out]: Base::ControlOutput the output signal and any additional/changed data used for continued computations
          */
-        void update(const Utils::ControlInput input, Utils::ControlOutput &out) {
+        virtual void update(const Base::ControlInput input, Base::ControlOutput &out) {
             // Set the input using the state
-            static_cast<Utils::ControlInput>(input_with_state_).copy(input);
-            input_with_state_.setIntegratedError(state_.getIntegratedError());
+            static_cast<Base::ControlInput>(input_with_state_).copy(input);
+            input_with_state_.setPreviousError(state_.getPreviousError());
 
             // Run the update
-            Utils::Utilities::integral(input_with_state_, settings_, state_);
+            DerivativeStateless::update(input_with_state_, settings_, state_);
 
             // Copy to output
-            out.copy(static_cast<Utils::ControlOutput>(state_));
+            out.copy(static_cast<Base::ControlOutput>(state_));
         }
 
         /**
          * Reset the internal state
          */
-        void reset() {
-            state_.setIntegratedError(0.0);
+        virtual void reset() {
+            state_.setPreviousError(0.0);
         }
+
+        virtual bool isStateful() { return true; }
 
     private:
         // The stored settings
-        Utils::IntegralSettings settings_;
+        DerivativeSettings settings_;
 
         // Contains all required state info
-        Utils::IntegralOutput state_;
+        DerivativeOutput state_;
 
         // Used for the internal call with state
-        Utils::IntegralInput input_with_state_;
+        DerivativeInput input_with_state_;
 };
 
+}  // namespace PID
 }  // namespace ControlAlgorithms
 
 #endif

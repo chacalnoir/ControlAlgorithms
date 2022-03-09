@@ -5,18 +5,18 @@
  * @date 2022/03/08
  */
 
-#include <proportional.h>
-#include <integral.h>
-#include <derivative.h>
+#include <pid/proportional.h>
+#include <pid/integral.h>
+#include <pid/derivative.h>
 #include <Arduino.h>
 
 // These are each defined separately so the user can mix and match as they choose.
-ControlAlgorithms::Proportional control_p;
-ControlAlgorithms::Integral control_i;
-ControlAlgorithms::Derivative control_d;
+ControlAlgorithms::PID::Proportional control_p;
+ControlAlgorithms::PID::Integral control_i;
+ControlAlgorithms::PID::Derivative control_d;
 // In/out information
-ControlAlgorithms::Utils::ControlInput input;
-ControlAlgorithms::Utils::ControlOutput output;
+ControlAlgorithms::Base::ControlInput input;
+ControlAlgorithms::Base::ControlOutput output;
 
 // Timing
 uint64_t msNow{0L};
@@ -36,18 +36,18 @@ void setup() {
 
   // Set appropriate settings
   // Proportional
-  ControlAlgorithms::Utils::ControlSettings p_settings;
+  ControlAlgorithms::Base::ControlSettings p_settings;
   p_settings.setGain(-0.4);
 
   // Integral
-  ControlAlgorithms::Utils::IntegralSettings i_settings;
+  ControlAlgorithms::PID::IntegralSettings i_settings;
   i_settings.setGain(-0.2);
   i_settings.setHasLimits(true);
   i_settings.setMinLimit(-100.0);
   i_settings.setMaxLimit(100.0);
 
   // Derivative
-  ControlAlgorithms::Utils::DerivativeSettings d_settings;
+  ControlAlgorithms::PID::DerivativeSettings d_settings;
   d_settings.setMinTimeStep(0.0000001);
   d_settings.setGain(-0.1);
 

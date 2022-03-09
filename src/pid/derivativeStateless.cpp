@@ -21,38 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * Stateless implementation of control algorithms
+ * Stateless implementation of derivative control
  * 
  * @author Joel Dunham <joel.ph.dunham@gmail.com>
  * @date 2022/03/08
  */
 
-#include "utilities.h"
+#include "derivativeStateless.h"
 #include <algorithm>
 
 namespace ControlAlgorithms {
-namespace Utils {
 
-void Utilities::proportional(const ControlInput input, const ControlSettings settings, ControlOutput &out) {
-    out.setControl(input.getError() * settings.getGain());
-}
+namespace PID {
 
-void Utilities::integral(const IntegralInput input, const IntegralSettings settings, IntegralOutput &out) {
-    out.setControl(input.getError() * settings.getGain());
-
-    // Update the integral state
-    out.setIntegratedError(input.getIntegratedError() + input.getError() * input.getDeltaT());
-
-    // Handle windup limits
-    if(settings.getHasLimits()) {
-        out.setIntegratedError(std::min(settings.getMaxLimit(), std::max(settings.getMinLimit(), out.getIntegratedError())));
-    }
-
-    // Calculate and return the control signal
-    out.setControl(out.getIntegratedError() * settings.getGain());
-}
-
-void Utilities::derivative(const DerivativeInput input, const DerivativeSettings settings, DerivativeOutput &out) {
+void DerivativeStateless::update(const DerivativeInput input, const DerivativeSettings settings, DerivativeOutput &out) {
     // Update the derivative calculation
     float error_derivative = (input.getError() - input.getPreviousError()) / std::max(input.getDeltaT(), settings.getMinTimeStep());
 
@@ -63,5 +45,5 @@ void Utilities::derivative(const DerivativeInput input, const DerivativeSettings
     out.setControl(error_derivative * settings.getGain());
 }
 
-}  // namespace Utils
+}  // namespace PID
 }  // namespace ControlAlgorithms
