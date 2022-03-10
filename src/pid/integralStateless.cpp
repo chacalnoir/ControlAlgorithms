@@ -35,8 +35,6 @@ namespace ControlAlgorithms {
 namespace PID {
 
 void IntegralStateless::update(const IntegralInput input, const IntegralSettings settings, IntegralOutput &out) {
-    out.setControl(input.getError() * settings.getGain());
-
     // Update the integral state
     out.setIntegratedError(input.getIntegratedError() + input.getError() * input.getDeltaT());
 

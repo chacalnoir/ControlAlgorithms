@@ -60,7 +60,7 @@ class Proportional {
             ProportionalStateless::update(input, settings_, out);
         }
 
-        virtual bool isStateful() { return false; }
+        virtual bool isStateful() { return true; }
 
     private:
         Base::ControlSettings settings_;
