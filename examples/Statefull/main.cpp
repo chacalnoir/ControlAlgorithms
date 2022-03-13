@@ -66,7 +66,7 @@ void loop() {
   if(test_counter++ >= TEST_CASES) {
     test_counter = 0;
   }
-  input.setDeltaT((float)(msNow - msLastTime) * 1.0e-6);
+  input.setDeltaT((float)(msNow - msLastTime) / 1000.0f);
   Serial.println("Test case");
   Serial.print("Error: ");
   Serial.println(input.getError());
